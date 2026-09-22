@@ -1,0 +1,7 @@
+node_modules
+.git
+*.db
+.env
+.venv
+dashboard
+packages/dashboard
