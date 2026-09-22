@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Invites - <%= guild.name %> — VARUNASTRA</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
+  <div class="nav"><a href="/" class="logo"><span class="pulse-dot"></span><span>VARUNASTRA</span></a><div class="nav-r"><span style="font-size:0.85rem;font-weight:500;"><%= user.username %></span></div></div>
+  <div class="layout" data-guild="<%= guild.id %>">
+    <%- include('partials/sidebar') %>
+    <div class="main">
+      <h1>&#128279; Invite Tracker</h1>
+      <p class="sub">Track who invites the most members.</p>
+      <div class="card">
+        <div class="card-h"><h2>&#128279; Settings</h2><span class="badge <%= settings.inviteTracker ? 'b-green' : 'b-red' %>"><%= settings.inviteTracker ? 'ON' : 'OFF' %></span></div>
+        <div class="sw"><div class="info"><div class="t">Enable Invite Tracking</div><div class="d">Track which users invite new members</div></div><label class="toggle"><input type="checkbox" <%= settings.inviteTracker ? 'checked' : '' %> data-auto="inviteTracker"><span class="sl"></span></label></div>
+        <div class="field" style="margin-top:1rem;"><label>Log Channel</label><select data-auto="inviteLogChannel"><option value="">Select</option><% channels.forEach(ch => { %><option value="<%= ch.id %>" <%= settings.inviteLogChannel === ch.id ? 'selected' : '' %>>#<%= ch.name %></option><% }); %></select></div>
+      </div>
+      <div class="card">
+        <div class="card-h"><h2>&#127942; Leaderboard</h2><span class="badge b-blue"><%= leaderboard.length %></span></div>
+        <% if (!leaderboard.length) { %><div class="empty"><div class="ic">&#128279;</div><h3>No data yet</h3></div><% } else { %>
+          <table class="tbl"><thead><tr><th>#</th><th>User</th><th>Invites</th></tr></thead><tbody>
+          <% leaderboard.forEach((e, i) => { %><tr><td><strong><%= i + 1 %></strong></td><td><%= e.userId %></td><td><span class="badge b-green"><%= e.uses %></span></td></tr><% }); %>
+          </tbody></table>
+        <% } %>
+      </div>
+    </div>
+  </div>
+  <script src="/js/dashboard.js"></script>
+</body>
+</html>

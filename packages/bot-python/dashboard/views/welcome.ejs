@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Welcome - <%= guild.name %> — VARUNASTRA</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
+  <div class="nav">
+    <a href="/" class="logo"><span class="pulse-dot"></span><span>VARUNASTRA</span></a>
+    <div class="nav-r"><span style="font-size:0.85rem;font-weight:500;"><%= user.username %></span></div>
+  </div>
+  <div class="layout" data-guild="<%= guild.id %>">
+    <%- include('partials/sidebar') %>
+    <div class="main">
+      <h1>&#128075; Welcome & Goodbye</h1>
+<p class="sub">Configure welcome and goodbye messages. Click <strong>Save to Supabase</strong> in the top nav to push changes to cloud.</p>
+       <% if (typeof query !== 'undefined' && query.error) { %><p class="sub" style="color:#f87171"><%= query.error %></p><% } %>
+       <% if (typeof query !== 'undefined' && query.sent) { %><p class="sub" style="color:#4ade80"><%= query.sent %></p><% } %>
+
+      <div class="card">
+        <div class="card-h"><h2>&#128075; Welcome</h2><span class="badge <%= settings.welcomeEnabled ? 'b-green' : 'b-red' %>"><%= settings.welcomeEnabled ? 'ON' : 'OFF' %></span></div>
+        <div class="sw"><div class="info"><div class="t">Enable Welcome</div><div class="d">Send a message when someone joins</div></div><label class="toggle"><input type="checkbox" <%= settings.welcomeEnabled ? 'checked' : '' %> data-auto="welcomeEnabled"><span class="sl"></span></label></div>
+        <div class="field" style="margin-top:1rem;"><label>Channel</label><select data-auto="welcomeChannel"><option value="">Select</option><% channels.forEach(ch => { %><option value="<%= ch.id %>" <%= settings.welcomeChannel === ch.id ? 'selected' : '' %>>#<%= ch.name %></option><% }); %></select></div>
+        <div class="field"><label>Message</label><textarea rows="3" data-auto="welcomeMessage"><%= settings.welcomeMessage || '' %></textarea><small>Variables: <code>{user}</code> mention, <code>{server}</code> server, <code>{memberCount}</code> count</small></div>
+        <div class="row r3">
+          <div class="field"><label>Color</label><input type="color" value="<%= settings.welcomeColor || '#00ff00' %>" data-auto="welcomeColor"></div>
+          <div class="field"><label><input type="checkbox" <%= settings.welcomeEmbed ? 'checked' : '' %> data-auto="welcomeEmbed"> Embed</label></div>
+          <div class="field"><label>Image</label><input type="url" value="<%= settings.welcomeImage || '' %>" placeholder="https://example.com/image.png" data-auto="welcomeImage" pattern="https?://.+\.(png|jpe?g|gif|webp|svg).*" title="Direct image URL (png, jpg, gif, webp, svg)"><small>Direct image link (.png, .jpg, .gif, .webp)</small><button type="button" onclick="document.querySelector('[data-auto=welcomeImage]').value=''" style="margin-top:4px;padding:4px 8px;background:#ef4444;color:#fff;border:none;border-radius:4px;cursor:pointer;font-size:0.75rem;">Clear Image</button></div>
+        </div>
+        <div class="field"><label>Auto-assign Roles</label><select multiple style="height:80px;" data-auto="welcomeRoles"><% roles.forEach(r => { %><option value="<%= r.id %>" <%= (settings.welcomeRoles || []).includes(r.id) ? 'selected' : '' %>><%= r.name %></option><% }); %></select><small>Hold Ctrl/Cmd for multiple</small></div>
+        <div style="margin-top:1rem;"><label style="font-weight:500;font-size:0.85rem;display:block;margin-bottom:0.5rem;">&#128065; Preview</label>
+          <div class="msg-pre"><div class="mh"><div class="ma">B</div><div><div class="mn">Bot</div></div><div class="mt">Today</div></div><div class="mc"><strong style="color:var(--accent2);">@User</strong> <%= (settings.welcomeMessage || '').replace('{user}','').replace('{server}',guild.name).replace('{memberCount}',guild.memberCount) %></div><% if (settings.welcomeImage) { %><div style="margin-top:8px;"><img src="<%= settings.welcomeImage %>" style="max-width:100%;max-height:200px;border-radius:8px;border:1px solid rgba(139,92,246,0.3);" onerror="this.style.display='none'" alt="Welcome image"></div><% } %></div>
+        </div>
+        <form action="/dashboard/<%= guild.id %>/test-message/welcome" method="POST" style="margin-top:1rem;"><button type="submit" class="btn btn-s">🧪 Send Test Welcome Message</button></form>
+      </div>
+
+      <div class="card">
+        <div class="card-h"><h2>&#128075; Goodbye</h2><span class="badge <%= settings.goodbyeEnabled ? 'b-green' : 'b-red' %>"><%= settings.goodbyeEnabled ? 'ON' : 'OFF' %></span></div>
+        <div class="sw"><div class="info"><div class="t">Enable Goodbye</div><div class="d">Send a message when someone leaves</div></div><label class="toggle"><input type="checkbox" <%= settings.goodbyeEnabled ? 'checked' : '' %> data-auto="goodbyeEnabled"><span class="sl"></span></label></div>
+        <div class="field" style="margin-top:1rem;"><label>Channel</label><select data-auto="goodbyeChannel"><option value="">Select</option><% channels.forEach(ch => { %><option value="<%= ch.id %>" <%= settings.goodbyeChannel === ch.id ? 'selected' : '' %>>#<%= ch.name %></option><% }); %></select></div>
+        <div class="field"><label>Message</label><textarea rows="3" data-auto="goodbyeMessage"><%= settings.goodbyeMessage || '' %></textarea></div>
+        <div class="row r3">
+          <div class="field"><label>Color</label><input type="color" value="<%= settings.goodbyeColor || '#ff0000' %>" data-auto="goodbyeColor"></div>
+          <div class="field"><label><input type="checkbox" <%= settings.goodbyeEmbed ? 'checked' : '' %> data-auto="goodbyeEmbed"> Embed</label></div>
+          <div class="field"><label>Image</label><input type="url" value="<%= settings.goodbyeImage || '' %>" placeholder="https://example.com/image.png" data-auto="goodbyeImage" pattern="https?://.+\.(png|jpe?g|gif|webp|svg).*" title="Direct image URL (png, jpg, gif, webp, svg)"><small>Direct image link (.png, .jpg, .gif, .webp)</small></div>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-h"><h2>&#128142; Server Boost</h2></div>
+        <div class="field"><label>Boost Message</label><textarea rows="2" data-auto="boostMessage"><%= settings.boostMessage || '' %></textarea></div>
+        <div class="field"><label>Channel</label><select data-auto="boostChannel"><option value="">Select</option><% channels.forEach(ch => { %><option value="<%= ch.id %>" <%= settings.boostChannel === ch.id ? 'selected' : '' %>>#<%= ch.name %></option><% }); %></select></div>
+      </div>
+
+      <div class="card">
+        <div class="card-h"><h2>&#128274; Verification</h2><span class="badge <%= settings.verificationEnabled ? 'b-green' : 'b-red' %>"><%= settings.verificationEnabled ? 'ON' : 'OFF' %></span></div>
+        <div class="sw"><div class="info"><div class="t">Enable Verification</div><div class="d">New members must verify before chatting</div></div><label class="toggle"><input type="checkbox" <%= settings.verificationEnabled ? 'checked' : '' %> data-auto="verificationEnabled"><span class="sl"></span></label></div>
+        <div class="field" style="margin-top:1rem;"><label>Verification Channel</label><select data-auto="verificationChannel"><option value="">Select</option><% channels.forEach(ch => { %><option value="<%= ch.id %>" <%= settings.verificationChannel === ch.id ? 'selected' : '' %>>#<%= ch.name %></option><% }); %></select></div>
+        <div class="field"><label>Verified Role</label><select data-auto="verificationRole"><option value="">Select</option><% roles.forEach(r => { %><option value="<%= r.id %>" <%= settings.verificationRole === r.id ? 'selected' : '' %>><%= r.name %></option><% }); %></select></div>
+        <div class="field"><label>Message</label><textarea rows="2" data-auto="verificationMessage"><%= settings.verificationMessage || 'Welcome! Please react with ✅ to verify.' %></textarea></div>
+      </div>
+
+      <div class="card">
+        <div class="card-h"><h2>&#128101; Account Restrictions</h2></div>
+        <div class="sw"><div class="info"><div class="t">&#128197; Account Age Gate</div><div class="d">Kick new accounts younger than X days</div></div><label class="toggle"><input type="checkbox" <%= settings.accountAgeGate ? 'checked' : '' %> data-auto="accountAgeGate"><span class="sl"></span></label></div>
+        <div class="field"><label>Min Account Age (days)</label><input type="number" value="<%= settings.minAccountAge || 7 %>" min="1" max="30" data-auto="minAccountAge"></div>
+        <div class="sw"><div class="info"><div class="t">&#128274; New Member Restriction</div><div class="d">Block links/images from new members</div></div><label class="toggle"><input type="checkbox" <%= settings.newMemberRestriction ? 'checked' : '' %> data-auto="newMemberRestriction"><span class="sl"></span></label></div>
+        <div class="field"><label>Restriction Duration (days)</label><input type="number" value="<%= settings.newMemberRestrictionDays || 1 %>" min="1" max="7" data-auto="newMemberRestrictionDays"></div>
+        <div class="sw"><div class="info"><div class="t">&#9200; Auto-Timeout New Members</div><div class="d">Timeout new members temporarily</div></div><label class="toggle"><input type="checkbox" <%= settings.newMemberTimeout ? 'checked' : '' %> data-auto="newMemberTimeout"><span class="sl"></span></label></div>
+      </div>
+    </div>
+  </div>
+  <script src="/js/dashboard.js"></script>
+</body>
+</html>

@@ -1,6 +1,8 @@
 import os
+import sys
 import asyncio
 import logging
+import subprocess
 from pathlib import Path
 
 import disnake
@@ -39,7 +41,7 @@ class NexusBot(commands.Bot):
             )
         )
         guild_count = len(self.guilds)
-        user_count = sum(g.guild.member_count or 0 for g in self.guilds)
+        user_count = sum(g.member_count or 0 for g in self.guilds)
         logger.info("═" * 40)
         logger.info("  NEXUS ONLINE")
         logger.info(f"  Bot: {self.user} (ID: {self.user.id})")
@@ -78,9 +80,24 @@ class NexusLoader:
         logger.info(f"NexusLoader: {loaded} loaded, {failed} failed")
 
 
+def start_dashboard():
+    dashboard_dir = Path(__file__).parent / "dashboard"
+    try:
+        subprocess.Popen(
+            [sys.executable, "-m", "npm", "start"],
+            cwd=str(dashboard_dir),
+            stdout=subprocess.PIPE,
+            stderr=subprocess.PIPE,
+        )
+        logger.info("Dashboard server starting...")
+    except Exception as e:
+        logger.error(f"Failed to start dashboard: {e}")
+
+
 if __name__ == "__main__":
     loader = NexusLoader(bot)
     loader.load_all()
+    start_dashboard()
 
     if not TOKEN:
         logger.error("No bot token found! Set TOKEN or DISCORD_TOKEN env var.")

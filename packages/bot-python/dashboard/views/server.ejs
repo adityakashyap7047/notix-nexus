@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Settings - <%= guild.name %> — VARUNASTRA</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
+  <div class="cyber-grid"></div>
+  <canvas id="matrix-canvas"></canvas>
+  <canvas id="particle-canvas"></canvas>
+  <div class="scanlines"></div>
+
+  <div class="nav">
+    <a href="/" class="logo"><span class="pulse-dot"></span><span>VARUNASTRA</span></a>
+    <div class="nav-r">
+      <span style="font-size:0.85rem;font-weight:500;color:var(--text2)"><%= user.username %></span>
+    </div>
+  </div>
+  <div class="layout" data-guild="<%= guild.id %>">
+    <%- include('partials/sidebar') %>
+    <div class="main">
+      <h1>&#9881; General Settings</h1>
+<p class="sub">Toggle settings below, then click the <strong>Save to Supabase</strong> button in the top nav to push changes to cloud.</p>
+
+       <div class="stats">
+        <div class="stat reveal"><div class="n"><%= guild.memberCount %></div><div class="l">Members</div></div>
+        <div class="stat reveal"><div class="n"><%= guild.channels.cache.size %></div><div class="l">Channels</div></div>
+        <div class="stat reveal"><div class="n"><%= guild.roles.cache.size %></div><div class="l">Roles</div></div>
+        <div class="stat reveal"><div class="n"><%= stats.warnings %></div><div class="l">Warnings</div></div>
+        <div class="stat reveal"><div class="n"><%= stats.customCommands %></div><div class="l">Commands</div></div>
+        <div class="stat reveal"><div class="n"><%= stats.levels %></div><div class="l">Leveled</div></div>
+      </div>
+
+      <div class="card reveal">
+        <div class="card-h"><h2>&#128295; General</h2><span class="badge b-yellow">Manual Save</span></div>
+        <div class="field">
+          <label>Bot Prefix</label>
+          <input type="text" value="<%= settings.prefix || '!' %>" style="width:80px;" data-auto="prefix">
+          <small>The prefix for text commands</small>
+        </div>
+      </div>
+
+      <div class="card reveal">
+        <div class="card-h"><h2>&#127991; Auto Role</h2></div>
+        <div class="sw">
+          <div class="info"><div class="t">Enable Auto Role</div><div class="d">Assign a role to new members automatically</div></div>
+          <label class="toggle"><input type="checkbox" <%= settings.autoroleEnabled ? 'checked' : '' %> data-auto="autoroleEnabled"><span class="sl"></span></label>
+        </div>
+        <div class="field" style="margin-top:1rem;">
+          <label>Role to Assign</label>
+          <select data-auto="autoroleId"><option value="">None</option><% roles.forEach(r => { %><option value="<%= r.id %>" <%= settings.autoroleId === r.id ? 'selected' : '' %>><%= r.name %></option><% }); %></select>
+        </div>
+      </div>
+
+      <div class="card reveal">
+        <div class="card-h"><h2>&#128196; Server Info</h2></div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:0.8rem;font-size:0.83rem;">
+          <div><span style="color:var(--text3);">Server ID:</span> <strong style="font-family:'JetBrains Mono',monospace"><%= guild.id %></strong></div>
+          <div><span style="color:var(--text3);">Owner:</span> <strong><%= guild.ownerId %></strong></div>
+          <div><span style="color:var(--text3);">Boost Level:</span> <strong><%= guild.premiumTier || 0 %></strong></div>
+          <div><span style="color:var(--text3);">Boosts:</span> <strong><%= guild.premiumSubscriptionCount || 0 %></strong></div>
+          <div><span style="color:var(--text3);">Verification:</span> <strong><%= guild.verificationLevel %></strong></div>
+          <div><span style="color:var(--text3);">Emojis:</span> <strong><%= guild.emojis.cache.size %></strong></div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <script src="/js/dashboard.js"></script>
+</body>
+</html>

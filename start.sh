@@ -1,5 +1,5 @@
 #!/bin/bash
-cd /app/packages/dashboard
-npm start &
+cd /app/packages/bot-python/dashboard
+node server.js &
 cd /app/packages/bot-python
-python main.py
+python3 main.py
