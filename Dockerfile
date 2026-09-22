@@ -7,6 +7,8 @@ RUN npm install
 
 COPY . .
 
-RUN npm run build --workspace=packages/bot
+RUN npm run build --workspace=packages/dashboard
 
-CMD ["npm", "run", "start", "--workspace=packages/bot"]
+EXPOSE 3000
+
+CMD ["npm", "run", "start", "--workspace=packages/dashboard"]

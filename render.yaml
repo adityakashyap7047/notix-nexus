@@ -3,12 +3,9 @@ services:
     name: notix-nexus
     runtime: node
     plan: free
-    buildCommand: npm install && npm run build
-    startCommand: npm run start --workspace=packages/bot
+    dockerfilePath: ./Dockerfile
     envVars:
       - key: NODE_ENV
         value: production
-      - key: TOKEN
-        sync: false
-      - key: CLIENT_ID
-        value: "1505996435899027586"
+      - key: NEXT_TELEMETRY_DISABLED
+        value: 1
