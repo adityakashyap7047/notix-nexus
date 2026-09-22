@@ -212,6 +212,9 @@ export interface IReactionRole extends Document {
   messageId: string;
   emoji: string;
   roleId: string;
+  type: "reaction" | "button";
+  label?: string;
+  style?: number;
 }
 
 const ReactionRoleSchema = new Schema<IReactionRole>({
@@ -220,10 +223,134 @@ const ReactionRoleSchema = new Schema<IReactionRole>({
   messageId: { type: String, required: true },
   emoji: { type: String, required: true },
   roleId: { type: String, required: true },
+  type: { type: String, enum: ["reaction", "button"], default: "reaction" },
+  label: { type: String },
+  style: { type: Number },
 });
 
 ReactionRoleSchema.index({ messageId: 1, emoji: 1 }, { unique: true });
 export const ReactionRole = mongoose.model<IReactionRole>("ReactionRole", ReactionRoleSchema);
+
+export interface IEvent extends Document {
+  guildId: string;
+  creatorId: string;
+  name: string;
+  description: string;
+  date: Date;
+  channelId: string;
+  messageId?: string;
+  attendees: string[];
+  ended: boolean;
+}
+
+const EventSchema = new Schema<IEvent>({
+  guildId: { type: String, required: true },
+  creatorId: { type: String, required: true },
+  name: { type: String, required: true },
+  description: { type: String, default: "" },
+  date: { type: Date, required: true },
+  channelId: { type: String, required: true },
+  messageId: String,
+  attendees: { type: [String], default: [] },
+  ended: { type: Boolean, default: false },
+}, { timestamps: true });
+
+EventSchema.index({ guildId: 1, ended: 1 });
+export const Event = mongoose.model<IEvent>("Event", EventSchema);
+
+export interface IServerAnalytics extends Document {
+  guildId: string;
+  date: string;
+  messageCount: number;
+  memberCount: number;
+  voiceMinutes: number;
+  commandsUsed: number;
+  newMembers: number;
+  leftMembers: number;
+}
+
+const ServerAnalyticsSchema = new Schema<IServerAnalytics>({
+  guildId: { type: String, required: true },
+  date: { type: String, required: true },
+  messageCount: { type: Number, default: 0 },
+  memberCount: { type: Number, default: 0 },
+  voiceMinutes: { type: Number, default: 0 },
+  commandsUsed: { type: Number, default: 0 },
+  newMembers: { type: Number, default: 0 },
+  leftMembers: { type: Number, default: 0 },
+}, { timestamps: true });
+
+ServerAnalyticsSchema.index({ guildId: 1, date: 1 }, { unique: true });
+export const ServerAnalytics = mongoose.model<IServerAnalytics>("ServerAnalytics", ServerAnalyticsSchema);
+
+export interface IVoiceSession extends Document {
+  guildId: string;
+  userId: string;
+  channelId: string;
+  joinTime: Date;
+  leaveTime?: Date;
+  duration: number;
+}
+
+const VoiceSessionSchema = new Schema<IVoiceSession>({
+  guildId: { type: String, required: true },
+  userId: { type: String, required: true },
+  channelId: { type: String, required: true },
+  joinTime: { type: Date, default: Date.now },
+  leaveTime: Date,
+  duration: { type: Number, default: 0 },
+}, { timestamps: true });
+
+VoiceSessionSchema.index({ guildId: 1, userId: 1 });
+export const VoiceSession = mongoose.model<IVoiceSession>("VoiceSession", VoiceSessionSchema);
+
+export interface IAnnouncement extends Document {
+  guildId: string;
+  creatorId: string;
+  title: string;
+  content: string;
+  channelId: string;
+  scheduled?: Date;
+  sent: boolean;
+  pingRole?: string;
+}
+
+const AnnouncementSchema = new Schema<IAnnouncement>({
+  guildId: { type: String, required: true },
+  creatorId: { type: String, required: true },
+  title: { type: String, required: true },
+  content: { type: String, required: true },
+  channelId: { type: String, required: true },
+  scheduled: Date,
+  sent: { type: Boolean, default: false },
+  pingRole: String,
+}, { timestamps: true });
+
+AnnouncementSchema.index({ guildId: 1, sent: 1 });
+export const Announcement = mongoose.model<IAnnouncement>("Announcement", AnnouncementSchema);
+
+export interface IKnowledgeBase extends Document {
+  guildId: string;
+  creatorId: string;
+  title: string;
+  content: string;
+  category: string;
+  tags: string[];
+  views: number;
+}
+
+const KnowledgeBaseSchema = new Schema<IKnowledgeBase>({
+  guildId: { type: String, required: true },
+  creatorId: { type: String, required: true },
+  title: { type: String, required: true },
+  content: { type: String, required: true },
+  category: { type: String, default: "general" },
+  tags: { type: [String], default: [] },
+  views: { type: Number, default: 0 },
+}, { timestamps: true });
+
+KnowledgeBaseSchema.index({ guildId: 1, tags: 1 });
+export const KnowledgeBase = mongoose.model<IKnowledgeBase>("KnowledgeBase", KnowledgeBaseSchema);
 
 export interface IShop extends Document {
   guildId: string;

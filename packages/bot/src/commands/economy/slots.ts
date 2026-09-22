@@ -1,13 +1,13 @@
 import { NexusClient } from "../../index";
-import { Economy } from "../../models";
 export default {
-  name: "slots", description: "Play slots", category: "economy", aliases: ["slot"],
+  name: "slots", description: "Play slots", category: "economy",
   async execute(message: any, _args: string[], client: NexusClient) {
     const symbols = ["🍒", "🍋", "🍊", "🍇", "💎", "7️⃣", "🔔"];
     const reels = Array(3).fill(null).map(() => symbols[Math.floor(Math.random() * symbols.length)]);
     let payout = 0;
     if (reels[0] === reels[1] && reels[1] === reels[2]) payout = reels[0] === "💎" ? 500 : reels[0] === "7️⃣" ? 250 : 100;
     else if (reels[0] === reels[1] || reels[1] === reels[2]) payout = 20;
+    const { Economy } = require("../../models");
     const account = await Economy.findOne({ guildId: message.guild.id, userId: message.author.id }) || await Economy.create({ guildId: message.guild.id, userId: message.author.id });
     account.wallet += payout - (payout === 0 ? 10 : 0);
     await account.save();

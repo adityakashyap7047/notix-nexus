@@ -39,12 +39,35 @@ export interface Event {
   execute: (...args: any[]) => Promise<void>;
 }
 
+const guildSettingsCache: Map<string, IGuildSettings> = new Map();
+
+async function connectMongo(uri: string): Promise<boolean> {
+  try {
+    await mongoose.connect(uri, { serverSelectionTimeoutMS: 5000 });
+    console.log("[DB] MongoDB connected");
+    return true;
+  } catch (e) {
+    console.warn("[DB] MongoDB unavailable, running in memory mode");
+    return false;
+  }
+}
+
+function getDefaultSettings(guildId: string): IGuildSettings {
+  return {
+    guildId,
+    prefix: "!",
+    modules: { core: true, moderation: true, security: true, economy: false, leveling: true, fun: true, social: true, tickets: false },
+    autoMod: { antiSpam: true, antiLink: true, antiInvite: true, antiScam: true, badWords: [], scamAction: "delete" },
+    welcome: { enabled: false, message: "Welcome {user}!", embed: true },
+    goodbye: { enabled: false, message: "Goodbye {user}!", embed: true },
+    leveling: { enabled: true, xpMin: 15, xpMax: 25, cooldown: 60 },
+    economy: { enabled: true, currency: "Coins", dailyAmount: 100 },
+    customCommands: [],
+  } as any;
+}
+
 export async function createBot(): Promise<NexusClient> {
-  const client = new Client({
-    intents: [
-      32767,
-    ],
-  }) as NexusClient;
+  const client = new Client({ intents: [32767] }) as NexusClient;
 
   client.commands = new Collection();
   client.aliases = new Collection();
@@ -63,15 +86,17 @@ export async function createBot(): Promise<NexusClient> {
   };
   client.config = config;
 
-  client.getGuildSettings = async (guildId: string): Promise<IGuildSettings> => {
-    let settings = await GuildSettings.findOne({ guildId });
-    if (!settings) {
-      settings = await GuildSettings.create({ guildId });
-    }
-    return settings;
-  };
+  const useMongo = await connectMongo(config.mongodbUri);
 
-  await mongoose.connect(config.mongodbUri);
+  client.getGuildSettings = async (guildId: string): Promise<IGuildSettings> => {
+    if (useMongo) {
+      let settings = await GuildSettings.findOne({ guildId });
+      if (!settings) settings = await GuildSettings.create({ guildId });
+      return settings;
+    }
+    if (!guildSettingsCache.has(guildId)) guildSettingsCache.set(guildId, getDefaultSettings(guildId));
+    return guildSettingsCache.get(guildId)!;
+  };
 
   const { CommandHandler } = await import("./handlers/CommandHandler");
   const { EventHandler } = await import("./handlers/EventHandler");

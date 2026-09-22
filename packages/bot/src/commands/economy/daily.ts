@@ -1,8 +1,8 @@
 import { NexusClient } from "../../index";
-import { Economy } from "../../models";
 export default {
-  name: "daily", description: "Claim daily reward", category: "economy",
+  name: "daily", description: "Claim daily", category: "economy",
   async execute(message: any, _args: string[], client: NexusClient) {
+    const { Economy } = require("../../models");
     const settings = await client.getGuildSettings(message.guild.id);
     const amount = settings.economy?.dailyAmount || 100;
     const account = await Economy.findOne({ guildId: message.guild.id, userId: message.author.id }) || await Economy.create({ guildId: message.guild.id, userId: message.author.id });

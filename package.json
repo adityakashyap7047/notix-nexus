@@ -9,8 +9,10 @@
     "dev:bot": "npm run dev --workspace=packages/bot",
     "dev:dashboard": "npm run dev --workspace=packages/dashboard",
     "dev": "concurrently \"npm run dev:bot\" \"npm run dev:dashboard\"",
-    "build": "npm run build --workspaces",
+    "build": "npm run build --workspace=packages/dashboard",
+    "build:all": "npm run build --workspaces",
     "start": "concurrently \"npm run start --workspace=packages/bot\" \"npm run start --workspace=packages/dashboard\"",
+    "start:dashboard": "npm run start --workspace=packages/dashboard",
     "lint": "eslint . --ext .ts,.tsx",
     "typecheck": "turbo typecheck"
   },

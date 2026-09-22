@@ -67,7 +67,7 @@ export default {
     if (settings.customCommands?.length > 0) {
       for (const cmd of settings.customCommands) {
         if (message.content.toLowerCase() === `${prefix}${cmd.trigger.toLowerCase()}`) {
-          await message.channel.send(cmd.response).catch(() => {});
+          if ("send" in message.channel) await (message.channel as any).send(cmd.response).catch(() => {});
           return;
         }
       }

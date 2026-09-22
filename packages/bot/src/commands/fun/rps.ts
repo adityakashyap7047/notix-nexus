@@ -1,7 +1,7 @@
 import { NexusClient } from "../../index";
 export default {
   name: "rps", description: "Rock Paper Scissors", category: "fun",
-  options: [{ name: "choice", description: "rock, paper, or scissors", type: 3, required: true }],
+  options: [{ name: "choice", description: "rock, paper, scissors", type: 3, required: true }],
   async execute(message: any, args: string[], client: NexusClient) {
     const choices = ["rock", "paper", "scissors"];
     const user = (message.options?.getString?.("choice") || args[0] || "").toLowerCase();

@@ -1,68 +1,17 @@
-import { EmbedBuilder, CommandInteraction } from 'discord.js';
-import { NexusClient } from '../../index';
-import { COLORS } from '../../constants';
-import { Economy } from '../../models';
-
+import { NexusClient } from "../../index";
 export default {
-  name: 'withdraw',
-  description: 'Withdraw coins from your bank to your wallet',
-  category: 'economy',
-  cooldown: 3,
-  options: [
-    { name: 'amount', description: 'Amount to withdraw (or "all")', type: 3, required: true },
-  ],
-  async execute(interaction: CommandInteraction, client: NexusClient) {
-    const guildId = interaction.guild!.id;
-    const userId = interaction.user.id;
-    const amountStr = interaction.options.getString('amount', true);
-
-    const account = await Economy.findOne({ guildId, userId });
-    if (!account) {
-      return interaction.reply({
-        content: '❌ You don\'t have an economy account. Use `/daily` first.',
-        ephemeral: true,
-      });
-    }
-
-    let amount: number;
-    if (amountStr.toLowerCase() === 'all') {
-      amount = account.bank;
-    } else {
-      amount = parseInt(amountStr, 10);
-    }
-
-    if (isNaN(amount) || amount <= 0) {
-      return interaction.reply({
-        content: '❌ Please provide a valid positive number or use `all`.',
-        ephemeral: true,
-      });
-    }
-
-    if (amount > account.bank) {
-      return interaction.reply({
-        content: `❌ Insufficient funds. You only have **${account.bank.toLocaleString()}** coins in your bank.`,
-        ephemeral: true,
-      });
-    }
-
-    const updated = await Economy.findOneAndUpdate(
-      { guildId, userId },
-      { $inc: { wallet: amount, bank: -amount } },
-      { new: true },
-    );
-
-    const embed = new EmbedBuilder()
-      .setColor(COLORS.green)
-      .setTitle('🏦 Withdrawal Successful')
-      .setDescription(`Withdrew **${amount.toLocaleString()}** coins from your bank.`)
-      .addFields(
-        { name: '💵 Wallet', value: `${updated!.wallet.toLocaleString()} coins`, inline: true },
-        { name: '🏦 Bank', value: `${updated!.bank.toLocaleString()} coins`, inline: true },
-        { name: '💰 Total', value: `${(updated!.wallet + updated!.bank).toLocaleString()} coins`, inline: true },
-      )
-      .setFooter({ text: 'NOTIX NEXUS', iconURL: client.user?.displayAvatarURL() || undefined })
-      .setTimestamp();
-
-    await interaction.reply({ embeds: [embed] });
+  name: "withdraw", description: "Withdraw coins", category: "economy", aliases: ["wd"],
+  options: [{ name: "amount", description: "Amount", type: 3, required: true }],
+  async execute(message: any, args: string[], client: NexusClient) {
+    const amountStr = message.options?.getString?.("amount") || args[0];
+    if (!amountStr) return message.reply("Usage: !withdraw <amount>");
+    const { Economy } = require("../../models");
+    const account = await Economy.findOne({ guildId: message.guild.id, userId: message.author.id }) || await Economy.create({ guildId: message.guild.id, userId: message.author.id });
+    const amount = amountStr === "all" ? account.bank : parseInt(amountStr);
+    if (isNaN(amount) || amount <= 0 || account.bank < amount) return message.reply("Invalid amount.");
+    account.bank -= amount;
+    account.wallet += amount;
+    await account.save();
+    await message.reply({ embeds: [{ title: "🏦 Withdraw", description: `Withdrew **${amount}**.`, fields: [{ name: "Balance", value: `W: ${account.wallet} | B: ${account.bank}`, inline: true }], color: 0x00ff9c }] });
   },
 };
