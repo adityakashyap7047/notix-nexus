@@ -1,0 +1,26 @@
+import { MongoClient, MongoClientOptions } from "mongodb";
+
+const uri = process.env.MONGODB_URI || "";
+const options: MongoClientOptions = {};
+
+let client: MongoClient;
+let clientPromise: Promise<MongoClient>;
+
+if (!uri) {
+  const fakeClient = new MongoClient("mongodb://localhost:27017/placeholder", options);
+  clientPromise = Promise.resolve(fakeClient);
+} else if (process.env.NODE_ENV === "development") {
+  const globalWithMongo = global as typeof globalThis & {
+    _mongoClientPromise?: Promise<MongoClient>;
+  };
+  if (!globalWithMongo._mongoClientPromise) {
+    client = new MongoClient(uri, options);
+    globalWithMongo._mongoClientPromise = client.connect();
+  }
+  clientPromise = globalWithMongo._mongoClientPromise;
+} else {
+  client = new MongoClient(uri, options);
+  clientPromise = client.connect();
+}
+
+export default clientPromise;

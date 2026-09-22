@@ -3,6 +3,7 @@
 import { useState } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import { useSession, signOut } from "next-auth/react";
 import { clsx } from "clsx";
 
 const navItems = [
@@ -21,6 +22,7 @@ const navItems = [
 
 export default function Sidebar() {
   const pathname = usePathname();
+  const { data: session } = useSession();
   const [collapsed, setCollapsed] = useState(false);
 
   return (
@@ -63,6 +65,29 @@ export default function Sidebar() {
           );
         })}
       </nav>
+      {session?.user && !collapsed && (
+        <div className="p-4 border-t border-nexus-border">
+          <div className="flex items-center gap-3 mb-3">
+            {(session.user as any).image && (
+              <img
+                src={(session.user as any).image}
+                alt="avatar"
+                className="w-8 h-8 rounded-full border border-neon-cyan/30"
+              />
+            )}
+            <div className="flex-1 min-w-0">
+              <p className="text-sm font-medium text-white truncate">{session.user.name}</p>
+              <p className="text-[10px] text-gray-500 font-mono">LOGGED IN</p>
+            </div>
+          </div>
+          <button
+            onClick={() => signOut({ callbackUrl: "/" })}
+            className="w-full px-3 py-1.5 rounded-lg text-xs font-mono text-gray-400 hover:text-red-400 hover:bg-red-500/10 border border-transparent hover:border-red-500/20 transition-all"
+          >
+            SIGN OUT
+          </button>
+        </div>
+      )}
       <div className="p-4 border-t border-nexus-border">
         <div className="flex items-center gap-2">
           <div className="w-2 h-2 rounded-full bg-neon-green" />
