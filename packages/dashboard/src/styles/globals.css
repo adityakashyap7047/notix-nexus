@@ -1,0 +1,119 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;600;700&display=swap');
+
+:root {
+  --bg-primary: #05070D;
+  --bg-secondary: #080B12;
+  --bg-card: #0F1423;
+  --accent-cyan: #00F5FF;
+  --text-primary: #E2E8F0;
+  --text-muted: #64748B;
+  --border-primary: #1E293B;
+}
+
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+body {
+  background: #05070D;
+  color: #E2E8F0;
+  font-family: 'Inter', system-ui, sans-serif;
+  min-height: 100vh;
+}
+
+::-webkit-scrollbar { width: 6px; }
+::-webkit-scrollbar-track { background: #080B12; }
+::-webkit-scrollbar-thumb { background: #1E293B; border-radius: 3px; }
+
+.nexus-card {
+  background: #0F1423;
+  border: 1px solid #1E293B;
+  border-radius: 12px;
+  transition: all 0.3s ease;
+}
+.nexus-card:hover {
+  border-color: #334155;
+  transform: translateY(-2px);
+}
+
+.terminal {
+  background: #080B12;
+  border: 1px solid #1E293B;
+  border-radius: 8px;
+  font-family: 'JetBrains Mono', monospace;
+  padding: 16px;
+}
+
+.terminal-dot { width: 10px; height: 10px; border-radius: 50%; display: inline-block; }
+.terminal-dot.red { background: #FF5F56; }
+.terminal-dot.yellow { background: #FFBD2E; }
+.terminal-dot.green { background: #27C93F; }
+
+.grid-bg {
+  background-image: linear-gradient(rgba(0,245,255,0.03) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(0,245,255,0.03) 1px, transparent 1px);
+  background-size: 40px 40px;
+}
+
+.scan-line { position: relative; overflow: hidden; }
+.scan-line::after {
+  content: '';
+  position: absolute;
+  top: 0; left: 0; right: 0;
+  height: 2px;
+  background: linear-gradient(90deg, transparent, #00F5FF, transparent);
+  animation: scan 3s linear infinite;
+}
+@keyframes scan { 0% { top: -2px; } 100% { top: 100%; } }
+
+.status-dot {
+  width: 8px; height: 8px; border-radius: 50%;
+  display: inline-block;
+  animation: pulse 2s ease-in-out infinite;
+}
+.status-dot.online { background: #00FF9C; }
+.status-dot.offline { background: #64748B; }
+@keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.5; } }
+
+.toggle {
+  position: relative;
+  width: 44px; height: 24px;
+  background: #0D111C;
+  border-radius: 12px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  border: 1px solid #1E293B;
+}
+.toggle.active { background: rgba(0,245,255,0.2); border-color: #00F5FF; }
+.toggle::after {
+  content: '';
+  position: absolute;
+  top: 2px; left: 2px;
+  width: 18px; height: 18px;
+  background: #64748B;
+  border-radius: 50%;
+  transition: all 0.3s ease;
+}
+.toggle.active::after { left: 22px; background: #00F5FF; }
+
+.nexus-button {
+  background: linear-gradient(135deg, rgba(0,245,255,0.1), rgba(139,92,246,0.1));
+  border: 1px solid #00F5FF;
+  color: #00F5FF;
+  padding: 10px 20px;
+  border-radius: 8px;
+  font-family: 'JetBrains Mono', monospace;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+.nexus-button:hover {
+  background: linear-gradient(135deg, rgba(0,245,255,0.2), rgba(139,92,246,0.2));
+  box-shadow: 0 0 20px rgba(0,245,255,0.3);
+}
+
+.glow-cyan { box-shadow: 0 0 20px rgba(0,245,255,0.15); }
+
+.animate-fade-in { animation: fade-in 0.5s ease-out; }
+@keyframes fade-in { 0% { opacity: 0; transform: translateY(10px); } 100% { opacity: 1; transform: translateY(0); } }
