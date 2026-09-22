@@ -1,6 +1,15 @@
 import { Client, Collection } from "discord.js";
 import mongoose from "mongoose";
+import winston from "winston";
 import { GuildSettings, IGuildSettings } from "./models";
+
+const logger = winston.createLogger({
+  level: "info",
+  format: winston.format.combine(winston.format.timestamp(), winston.format.json()),
+  transports: [new winston.transports.Console()],
+});
+
+export { logger };
 
 export interface NexusClient extends Client {
   commands: Collection<string, Command>;
@@ -44,10 +53,10 @@ const guildSettingsCache: Map<string, IGuildSettings> = new Map();
 async function connectMongo(uri: string): Promise<boolean> {
   try {
     await mongoose.connect(uri, { serverSelectionTimeoutMS: 5000 });
-    console.log("[DB] MongoDB connected");
+    logger.info("MongoDB connected");
     return true;
   } catch (e) {
-    console.warn("[DB] MongoDB unavailable, running in memory mode");
+    logger.warn("MongoDB unavailable, running in memory mode");
     return false;
   }
 }

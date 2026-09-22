@@ -1,35 +1,28 @@
 "use client";
 
-import { useSession } from "next-auth/react";
-import { useRouter } from "next/navigation";
 import { useEffect } from "react";
+import { useRouter } from "next/navigation";
+import { useAuth } from "../../components/AuthContext";
 import Sidebar from "../../components/layout/Sidebar";
 
 export default function DashboardLayout({ children }: { children: React.ReactNode }) {
-  const { data: session, status } = useSession();
+  const { isAuthenticated } = useAuth();
   const router = useRouter();
 
   useEffect(() => {
-    if (status === "unauthenticated") router.push("/");
-  }, [status, router]);
+    if (!isAuthenticated) {
+      router.push("/");
+    }
+  }, [isAuthenticated, router]);
 
-  if (status === "loading") {
-    return (
-      <div className="flex h-screen items-center justify-center bg-nexus-bg">
-        <div className="text-center">
-          <div className="w-12 h-12 border-4 border-neon-cyan border-t-transparent rounded-full animate-spin mx-auto mb-4" />
-          <p className="text-neon-cyan font-mono text-sm">INITIALIZING...</p>
-        </div>
-      </div>
-    );
+  if (!isAuthenticated) {
+    return <div className="min-h-screen bg-nexus-bg" />;
   }
 
-  if (!session) return null;
-
   return (
-    <div className="flex h-screen">
+    <div className="flex h-screen overflow-hidden">
       <Sidebar />
-      <main className="flex-1 overflow-y-auto">{children}</main>
+      <main className="flex-1 overflow-y-auto p-6 grid-bg">{children}</main>
     </div>
   );
 }
