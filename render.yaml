@@ -9,3 +9,17 @@ services:
         value: production
       - key: NEXT_TELEMETRY_DISABLED
         value: 1
+      - key: TOKEN
+        sync: false
+      - key: DISCORD_TOKEN
+        sync: false
+      - key: DISCORD_CLIENT_ID
+        sync: false
+      - key: DISCORD_CLIENT_SECRET
+        sync: false
+      - key: MONGODB_URI
+        sync: false
+      - key: NEXTAUTH_SECRET
+        value: nexus_7f3k9x2m5q8w1e4r6t0y3u9i2o5p8a1s4d7f6g3h0j5k8l2
+      - key: NEXTAUTH_URL
+        value: https://notix-nexus.onrender.com
