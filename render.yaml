@@ -1,12 +1,16 @@
 services:
   - type: web
-    name: notix-nexus
+    name: notix-nexus-bot
     runtime: node
     plan: free
-    buildCommand: npm install && npm run build
-    startCommand: npm start
+    buildCommand: npm install && npm run build --workspace=packages/bot
+    startCommand: npm run start --workspace=packages/bot
     envVars:
       - key: NODE_ENV
         value: production
-      - key: NEXT_TELEMETRY_DISABLED
-        value: 1
+      - key: TOKEN
+        sync: false
+      - key: CLIENT_ID
+        value: "1505996435899027586"
+      - key: BOT_OWNER_ID
+        value: "123456789"
