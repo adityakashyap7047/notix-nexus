@@ -1,7 +1,7 @@
 services:
   - type: web
     name: notix-nexus
-    runtime: node
+    runtime: docker
     plan: free
     dockerfilePath: ./Dockerfile
     envVars:
@@ -20,6 +20,10 @@ services:
       - key: MONGODB_URI
         sync: false
       - key: NEXTAUTH_SECRET
-        value: nexus_7f3k9x2m5q8w1e4r6t0y3u9i2o5p8a1s4d7f6g3h0j5k8l2
+        sync: false
       - key: NEXTAUTH_URL
-        value: https://notix-nexus.onrender.com
+        sync: false
+      - key: BOT_API_URL
+        value: http://localhost:8000
+      - key: DASHBOARD_TYPE
+        value: ejs

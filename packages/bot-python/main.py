@@ -58,14 +58,20 @@ class NexusBot(commands.Bot):
 bot = NexusBot()
 
 
+import shutil
+import threading
+
 class NexusLoader:
     def __init__(self, bot_instance):
         self.bot = bot_instance
-        self.cogs_path = Path(__file__).parent / "cogs"
+        self.cogs_path = Path(__file__).parent / "bot" / "cogs"
 
     def load_all(self):
         loaded = 0
         failed = 0
+        if not self.cogs_path.exists():
+            logger.warning(f"NexusLoader: Cogs directory not found at {self.cogs_path}")
+            return
         for cog_file in sorted(self.cogs_path.glob("*.py")):
             if cog_file.name.startswith("_"):
                 continue
@@ -80,14 +86,31 @@ class NexusLoader:
         logger.info(f"NexusLoader: {loaded} loaded, {failed} failed")
 
 
+def start_api():
+    try:
+        import uvicorn
+        import web
+
+        def run_server():
+            uvicorn.run(web.app, host="0.0.0.0", port=8000, log_level="warning")
+
+        api_thread = threading.Thread(target=run_server, daemon=True)
+        api_thread.start()
+        logger.info("Nexus API server running on http://0.0.0.0:8000")
+    except Exception as e:
+        logger.error(f"Failed to start API: {e}")
+
+
 def start_dashboard():
+    # Only start dashboard if not handled by external process / script
+    if os.getenv("START_DASHBOARD_IN_BOT", "0") != "1":
+        return
     dashboard_dir = Path(__file__).parent / "dashboard"
     try:
+        node_bin = shutil.which("node") or "node"
         subprocess.Popen(
-            [sys.executable, "-m", "npm", "start"],
+            [node_bin, "server.js"],
             cwd=str(dashboard_dir),
-            stdout=subprocess.PIPE,
-            stderr=subprocess.PIPE,
         )
         logger.info("Dashboard server starting...")
     except Exception as e:
@@ -95,6 +118,7 @@ def start_dashboard():
 
 
 if __name__ == "__main__":
+    start_api()
     loader = NexusLoader(bot)
     loader.load_all()
     start_dashboard()

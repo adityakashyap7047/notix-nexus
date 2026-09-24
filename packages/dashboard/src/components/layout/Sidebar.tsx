@@ -139,7 +139,7 @@ export default function Sidebar() {
                     </div>
                     <div className="text-left min-w-0">
                       <p className="text-xs font-medium text-white truncate">{guild.name}</p>
-                      <p className="text-[10px] text-gray-500">{guild.memberCount.toLocaleString()}</p>
+                      <p className="text-[10px] text-gray-500">{guild.memberCount?.toLocaleString() || 0}</p>
                     </div>
                     {selectedGuild?.id === guild.id && (
                       <div className="w-2 h-2 rounded-full bg-neon-cyan ml-auto flex-shrink-0" />
